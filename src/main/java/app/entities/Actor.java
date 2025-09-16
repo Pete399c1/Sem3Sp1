@@ -1,13 +1,11 @@
 package app.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,5 +23,6 @@ public class Actor {
     private String name;
     private LocalDate birthDate;
 
-
+    @ManyToMany
+    private List<Movie> movies;
 }

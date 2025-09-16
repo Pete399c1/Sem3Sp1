@@ -1,9 +1,6 @@
 package app.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.security.PrivateKey;
@@ -28,4 +25,15 @@ public class Movie {
     private LocalDate releaseDate;
     private double rating;
     private double popularity;
+
+    //movie owns the relation
+    @ManyToMany(mappedBy = "movies")
+    private List<Actor> actors;
+
+    @ManyToOne
+    private Director director;
+
+    @ManyToMany(mappedBy = "movies")
+    private List<Genre> genres;
+
 }
