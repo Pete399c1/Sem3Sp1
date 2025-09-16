@@ -1,0 +1,40 @@
+@startuml
+'https://plantuml.com/class-diagram
+!pragma layout smetana
+
+class Movie{
+-int id
+-String title
+-String overview
+-LocalDate releaseDate
+-double rating
+-double popularity
+-List<Actor> actors
+-Director director
+-List<Genre> genres
+}
+
+class Actor{
+-int id
+-String name
+-LocalDate birthDate
+-List<Movie> movies
+}
+
+class Director{
+-int id
+-String name
+-LocalDate birthDate
+-List<Movie> movies
+}
+
+class Genre{
+-int id
+-String name
+-List<Movie> movies
+}
+
+Movie "*" <-----> "*" Actor
+Movie "*" ------> "1" Director
+Movie "*" <-----> "*" Genre
+@enduml
