@@ -5,12 +5,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.TypedQuery;
+import lombok.AllArgsConstructor;
 
 import java.util.List;
 
-public class MovieDAO {
-    private EntityManagerFactory emf;
+@AllArgsConstructor
+public class MovieDAO implements IDAO<Movie> {
+    private final EntityManagerFactory emf;
 
+    @Override
     public Movie create(Movie movie){
         try(EntityManager em = emf.createEntityManager()){
             em.getTransaction().begin();
@@ -23,10 +26,10 @@ public class MovieDAO {
     public Movie update(Movie movie){
         try(EntityManager em = emf.createEntityManager()){
             em.getTransaction().begin();
-            em.merge(movie);
-            em.getTransaction().begin();
+            Movie update = em.merge(movie);
+            em.getTransaction().commit();
+            return update;
         }
-        return movie;
     }
 
     public boolean delete(Integer id){
@@ -37,25 +40,22 @@ public class MovieDAO {
                 em.remove(movie);
                 em.getTransaction().commit();
                 return true;
-            }else{
-                return false;
             }
-        }catch (PersistenceException e){
             return false;
         }
     }
 
-    public Movie getByTitle(String title){
-        try(EntityManager em = emf.createEntityManager()){
-           return em.createQuery("select m from Movie m where m.title =:title", Movie.class)
-                   .setParameter("title",title)
-                   .getSingleResult();
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public List<Movie> getByTitle(String title){
+        try(EntityManager em = emf.createEntityManager()) {
+            //Using lower making sure that the title is case-insensitive
+            return em.createQuery("select m from Movie m where lower(m.title) = lower(:title)", Movie.class)
+                    .setParameter("title", title)
+                    .getResultList();
         }
     }
 
+    @Override
     public List<Movie> getAll(){
         try(EntityManager em = emf.createEntityManager()){
             TypedQuery<Movie> query = em.createQuery("select m from Movie m", Movie.class);
