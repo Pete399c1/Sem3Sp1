@@ -62,4 +62,13 @@ public class MovieDAO implements IDAO<Movie> {
             return query.getResultList();
         }
     }
+    /*
+    public Double getAverageRating(){
+        try(EntityManager em = emf.createEntityManager()){
+            return em.createQuery("select avg(m.rating) from Movie m", Double.class)
+                    .getSingleResult();
+        }
+    }
+     */
+
 }
