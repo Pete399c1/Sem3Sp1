@@ -9,29 +9,29 @@ class Movie{
 -LocalDate releaseDate
 -double rating
 -double popularity
--List<Actor> actors
+-Set<Actor> actors
 -Director director
--List<Genre> genres
+-Set<Genre> genres
 }
 
 class Actor{
 -int id
 -String name
 -LocalDate birthDate
--List<Movie> movies
+-Set<Movie> movies
 }
 
 class Director{
 -int id
 -String name
 -LocalDate birthDate
--List<Movie> movies
+-Set<Movie> movies
 }
 
 class Genre{
 -int id
 -String name
--List<Movie> movies
+-Set<Movie> movies
 }
 
 Movie "*" <-----> "*" Actor

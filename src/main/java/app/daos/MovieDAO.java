@@ -4,6 +4,9 @@ import app.entities.Movie;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceException;
+import jakarta.persistence.TypedQuery;
+
+import java.util.List;
 
 public class MovieDAO {
     private EntityManagerFactory emf;
@@ -53,4 +56,10 @@ public class MovieDAO {
         }
     }
 
+    public List<Movie> getAll(){
+        try(EntityManager em = emf.createEntityManager()){
+            TypedQuery<Movie> query = em.createQuery("select m from Movie m", Movie.class);
+            return query.getResultList();
+        }
+    }
 }
