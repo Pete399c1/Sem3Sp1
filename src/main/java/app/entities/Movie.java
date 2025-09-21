@@ -1,5 +1,6 @@
 package app.entities;
 
+import app.dtos.MovieDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,21 +27,40 @@ public class Movie {
 
     private int tmdbId;
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String overview;
     private LocalDate releaseDate;
     private double rating;
     private double popularity;
 
+    // mapping dto to entity by constructor
+    public Movie(MovieDTO movieDTO) {
+        this.tmdbId = movieDTO.getId();
+        this.title = movieDTO.getTitle();
+        this.overview = movieDTO.getOverview();
+        this.releaseDate = movieDTO.getReleaseDate();
+        this.rating = movieDTO.getRating();
+        this.popularity = movieDTO.getPopularity();
+    }
+
+
+
     //movie owns the relation
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
     private Set<Actor> actors = new HashSet<>();
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "director_id")
     private Director director;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
     private Set<Genre> genres = new HashSet<>();
+
+
 
     // update both sides
     public void addActor(Actor actor){
@@ -65,5 +85,4 @@ public class Movie {
             director.getMovies().add(this);
         }
     }
-
 }
