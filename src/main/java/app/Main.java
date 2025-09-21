@@ -1,11 +1,15 @@
 package app;
 
+import app.Services.DirectorService;
 import app.Services.MovieService;
 import app.config.HibernateConfig;
+import app.daos.DirectorDAO;
 import app.daos.MovieDAO;
+import app.entities.Director;
 import jakarta.persistence.EntityManagerFactory;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException, IOException {
@@ -14,8 +18,7 @@ public class Main {
         MovieService movieService = new MovieService(movieDAO);
 
         movieService.getAndSaveMoviesInTheLast2Years();
-
-       movieService.getTopTenHighestRated().forEach(System.out::println);
+        movieService.getTopTenHighestRated().forEach(System.out::println);
 
         emf.close();
     }
