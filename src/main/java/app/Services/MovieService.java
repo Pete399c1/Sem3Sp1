@@ -3,6 +3,7 @@ package app.Services;
 import app.daos.MovieDAO;
 import app.dtos.MovieDTO;
 import app.entities.Movie;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -32,6 +33,8 @@ public class MovieService {
             .registerModule(new JavaTimeModule());
 
     public void getAndSaveMoviesInTheLast2Years() throws IOException, InterruptedException{
+
+        FetchTools fetchTools = new FetchTools();
         // starting on page 1
         int currentPage = 1;
         // we do not know how many pages will be so setting it to one and so the while loop will run at least once
@@ -53,54 +56,25 @@ public class MovieService {
                     "&primary_release_date.gte=%s&primary_release_date.lte=%s&page=%d",
                     URL_DISCOVER, API_KEY, twoYearsAgo,nowToday, currentPage);
 
+            ApiResponse<MovieDTO> response = fetchTools.getFromApi(
+                    encodedURL,
+                    new TypeReference<ApiResponse<MovieDTO>>() {} //important to generics
+            );
 
+            if(response != null && response.getResults() != null){
+                totalPages = response.getTotal_pages();
 
-            HttpClient client= HttpClient.newHttpClient();
-
-            // the get request
-            HttpRequest request = HttpRequest.newBuilder()
-                    .version(HttpClient.Version.HTTP_1_1)
-                    .uri(URI.create(encodedURL))
-                    .GET()
-                    .build();
-
-            // send request and wait for answer
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            //check did we get the correct answer status code from the api
-            if(response.statusCode() == HttpURLConnection.HTTP_OK){
-                // converting the JSON answer to the tree JSONNode
-                JsonNode root = objectMapper.readTree(response.body());
-
-                // read the total_pages so that we know how many pages that exist
-                totalPages  = root.get("total_pages").asInt();
-
-                // get the result Array from JSON that has the movies on the page
-                JsonNode results = root.get("results");
-
-                // map JSON Array to the dto class (MovieDTO[])
-                MovieDTO[] pageMovies = objectMapper.readValue(results.toString(),MovieDTO[].class);
-
-                // for each movie on this page
-                for(MovieDTO movieDTO: pageMovies){
-
-                    // is the movie existing already
+                for(MovieDTO movieDTO : response.getResults()) {
+                    // save movie in db if not exist
                     boolean exist = movieDAO.getByTitle(movieDTO.getTitle())
                             .stream()
                             // avoid duplicates by checking the matches with tmdbId
                             .anyMatch(m -> m.getTmdbId() == movieDTO.getId());
-
-                    // if it dont exist create and save movie
                     if(!exist){
-                        Movie movie = new Movie(movieDTO);
-                        movieDAO.create(movie);
+                        movieDAO.create( new Movie(movieDTO));
                     }
                 }
-
-            }else{
-                throw  new IOException("It failed tying to get the data from the api");
             }
-            // going through the pages
             currentPage++;
         }
     }

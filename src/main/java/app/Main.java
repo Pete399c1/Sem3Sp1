@@ -18,7 +18,6 @@ public class Main {
         MovieService movieService = new MovieService(movieDAO);
 
         movieService.getAndSaveMoviesInTheLast2Years();
-        movieService.getTopTenHighestRated().forEach(System.out::println);
 
         emf.close();
     }

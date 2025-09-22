@@ -30,6 +30,7 @@ public class Movie {
 
     @Column(columnDefinition = "TEXT")
     private String overview;
+
     private LocalDate releaseDate;
     private double rating;
     private double popularity;
